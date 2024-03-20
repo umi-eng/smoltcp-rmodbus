@@ -1,4 +1,4 @@
-# `smoltcp` implemnetation for `rmodbus`
+# `smoltcp` implementation for `rmodbus`
 
 ## Usage
 
