@@ -1,6 +1,4 @@
-# `smoltcp` Modbus
-
-A [`smoltcp`](https://github.com/smoltcp-rs/smoltcp) client and server implementation.
+# `smoltcp` implemnetation for `rmodbus`
 
 ## Usage
 
@@ -8,7 +6,7 @@ Add an entry to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-smoltcp-modbus = "0.1.0"
+smoltcp-rmodbus = "0.1.0"
 ```
 
 ## Minimum supported Rust version
