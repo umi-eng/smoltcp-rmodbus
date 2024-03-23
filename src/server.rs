@@ -65,22 +65,16 @@ impl<CTX: ModbusContext> Server<CTX> {
 
         if !socket.is_open() {
             if !socket.is_listening() {
-                match socket.listen(PORT) {
-                    Ok(_) => {}
-                    Err(err) => return Err(Error::Listen(err)),
-                }
+                socket.listen(PORT).map_err(|err| Error::Listen(err))?;
             }
         }
 
         if socket.can_recv() && socket.can_recv() {
             let mut buf: ModbusFrameBuf = [0; 256];
 
-            let len = match socket.recv_slice(&mut buf) {
-                Ok(v) => v,
-                Err(err) => {
-                    return Err(Error::Receive(err));
-                }
-            };
+            let len = socket
+                .recv_slice(&mut buf)
+                .map_err(|err| Error::Receive(err))?;
 
             if len == 0 {
                 return Ok(ctx_mutated); // no bytes received
@@ -91,12 +85,7 @@ impl<CTX: ModbusContext> Server<CTX> {
             let mut frame =
                 ModbusFrame::new(1, &buf, ModbusProto::TcpUdp, &mut response);
 
-            match frame.parse() {
-                Ok(_) => {}
-                Err(err) => {
-                    return Err(Error::Modbus(err));
-                }
-            };
+            frame.parse().map_err(|err| Error::Modbus(err))?;
 
             if frame.processing_required {
                 let result = if frame.readonly {
@@ -106,22 +95,14 @@ impl<CTX: ModbusContext> Server<CTX> {
                     frame.process_write(&mut self.context)
                 };
 
-                match result {
-                    Ok(_) => {}
-                    Err(err) => {
-                        return Err(Error::Modbus(err));
-                    }
-                }
+                result.map_err(|err| Error::Modbus(err))?;
             }
 
             if frame.response_required {
                 frame.finalize_response().unwrap();
-                match socket.send_slice(response.as_slice()) {
-                    Ok(_) => {}
-                    Err(err) => {
-                        return Err(Error::Send(err));
-                    }
-                }
+                socket
+                    .send_slice(response.as_slice())
+                    .map_err(|err| Error::Send(err))?;
             }
         }
 
