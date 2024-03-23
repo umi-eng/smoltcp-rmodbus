@@ -6,6 +6,7 @@ use rmodbus::{
 use smoltcp::{
     iface::{SocketHandle, SocketSet},
     socket::tcp::{ListenError, RecvError, SendError, Socket, SocketBuffer},
+    time::Duration,
 };
 
 /// Error type.
@@ -49,7 +50,10 @@ impl<CTX: ModbusContext> Server<CTX> {
             return Err(Error::TxBufferTooSmall);
         }
 
-        let socket = Socket::new(rx_buffer, tx_buffer);
+        let mut socket = Socket::new(rx_buffer, tx_buffer);
+
+        socket.set_timeout(Some(Duration::from_secs(10)));
+
         let handle = sockets.add(socket);
 
         Ok(Self { handle, context })
