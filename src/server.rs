@@ -5,7 +5,9 @@ use rmodbus::{
 };
 use smoltcp::{
     iface::{SocketHandle, SocketSet},
-    socket::tcp::{ListenError, RecvError, SendError, Socket, SocketBuffer},
+    socket::tcp::{
+        ListenError, RecvError, SendError, Socket, SocketBuffer, State,
+    },
     time::Duration,
 };
 
@@ -71,6 +73,10 @@ impl<CTX: ModbusContext> Server<CTX> {
             if !socket.is_listening() {
                 socket.listen(PORT).map_err(|err| Error::Listen(err))?;
             }
+        }
+
+        if socket.state() == State::CloseWait {
+            socket.close();
         }
 
         if socket.can_recv() && socket.can_recv() {
