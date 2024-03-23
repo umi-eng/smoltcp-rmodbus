@@ -56,7 +56,11 @@ impl<CTX: ModbusContext> Server<CTX> {
     }
 
     /// Process socket data.
-    pub fn poll(&mut self, sockets: &mut SocketSet) -> Result<(), Error> {
+    ///
+    /// Returns `true` if the context was mutated.
+    pub fn poll(&mut self, sockets: &mut SocketSet) -> Result<bool, Error> {
+        let mut ctx_mutated = false;
+
         let socket = sockets.get_mut::<Socket>(self.handle);
 
         if !socket.is_open() {
@@ -79,7 +83,7 @@ impl<CTX: ModbusContext> Server<CTX> {
             };
 
             if len == 0 {
-                return Ok(()); // no bytes received
+                return Ok(ctx_mutated); // no bytes received
             }
 
             let mut response = heapless::Vec::<u8, 256>::new();
@@ -96,8 +100,9 @@ impl<CTX: ModbusContext> Server<CTX> {
 
             if frame.processing_required {
                 let result = if frame.readonly {
-                    frame.process_read(&mut self.context)
+                    frame.process_read(&self.context)
                 } else {
+                    ctx_mutated = true;
                     frame.process_write(&mut self.context)
                 };
 
@@ -120,7 +125,7 @@ impl<CTX: ModbusContext> Server<CTX> {
             }
         }
 
-        Ok(())
+        Ok(ctx_mutated)
     }
 
     /// Modbus context.
