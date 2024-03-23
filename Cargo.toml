@@ -1,5 +1,7 @@
 [package]
 name = "smoltcp-rmodbus"
+description = "A smoltcp implementation for rmodbus."
+license = "MPL-2.0"
 version = "0.1.0"
 edition = "2021"
 
