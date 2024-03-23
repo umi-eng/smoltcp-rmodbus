@@ -13,6 +13,7 @@ use smoltcp::{
 
 /// Error type.
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Error {
     /// Receive buffer too small.
     RxBufferTooSmall,
