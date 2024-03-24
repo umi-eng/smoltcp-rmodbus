@@ -10,4 +10,5 @@
 
 pub mod server;
 
+/// Default Modbus TCP port.
 pub const PORT: u16 = 502;

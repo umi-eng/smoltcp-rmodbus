@@ -1,3 +1,5 @@
+//! Server implementation.
+
 use crate::PORT;
 use rmodbus::{
     server::{context::ModbusContext, ModbusFrame},
