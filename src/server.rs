@@ -168,6 +168,6 @@ mod tests {
 
         let context = ModbusStorageSmall::new();
 
-        let server = Server::new(&mut socketset, rx, tx, context).unwrap();
+        let _server = Server::new(&mut socketset, rx, tx, context).unwrap();
     }
 }
