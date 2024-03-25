@@ -67,7 +67,11 @@ impl<CTX: ModbusContext> Server<CTX> {
     /// Process socket data.
     ///
     /// Returns `true` if the context was mutated.
-    pub fn poll(&mut self, sockets: &mut SocketSet) -> Result<bool, Error> {
+    pub fn poll(
+        &mut self,
+        sockets: &mut SocketSet,
+        unit_id: u8,
+    ) -> Result<bool, Error> {
         let mut ctx_mutated = false;
 
         let socket = sockets.get_mut::<Socket>(self.handle);
@@ -95,8 +99,12 @@ impl<CTX: ModbusContext> Server<CTX> {
 
             let mut response = heapless::Vec::<u8, 256>::new();
 
-            let mut frame =
-                ModbusFrame::new(1, &buf, ModbusProto::TcpUdp, &mut response);
+            let mut frame = ModbusFrame::new(
+                unit_id,
+                &buf,
+                ModbusProto::TcpUdp,
+                &mut response,
+            );
 
             frame.parse().map_err(|err| Error::Modbus(err))?;
 
